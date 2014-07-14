@@ -82,6 +82,21 @@ class RelateIQ{
         $this->data[$fieldId] = $optionId;
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /**
      * @param $name
      * @return bool|int|string
@@ -125,7 +140,7 @@ class RelateIQ{
     /**
      * @return array
      */
-    public function getList(){
+    public function _______getList(){
         $temp = array();
         $results = $this->newGet('lists');
         foreach($results->fields as $field){
@@ -162,17 +177,20 @@ class RelateIQ{
         return false;
     }
 
+    public function getList($listId){
+        return Resource\RelateIQList::fetch($listId);
+    }
+
+    public function getLists(){
+        return Resource\RelateIQList::fetchAll();
+    }
+
     public function getContact($cid){
-        $request = new Resource\RelateIQRequest();
-        $contact = Resource\RelateIQContact::createFromResponse( $request->newGet('contacts/'.$cid) );
-        print_r($contact);
-        return $contact;
+        return Resource\RelateIQContact::fetch($cid);
     }
 
     public function getContacts(){
-        $request = new Resource\RelateIQRequest($this->key, $this->secret);
-        $contact = Resource\RelateIQContact::createFromResponse( $request->newGet('contacts') );
-        return $contact;
+        return Resource\RelateIQContact::fetchAll();
     }
 
     /* Alias for creating new listitem entry */

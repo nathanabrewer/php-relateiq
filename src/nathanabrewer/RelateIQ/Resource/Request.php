@@ -43,7 +43,6 @@ class RelateIQRequest{
      * @return mixed
      */
     public function newGet($target,$data=null){
-        if($target=="lists") $target .= "/".$this->listId;
         return $this->send('GET', $target, $data);
     }
 
@@ -68,7 +67,9 @@ class RelateIQRequest{
 
         if($requestType == 'PUT' || $requestType == 'POST'){
             if(!$data) $data = $this->data;
-            $payload = json_encode($data);
+
+            $payload = (property_exists($data, 'json')) ? $data->json() : json_encode($data);
+
             curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
             $headers[] = 'Content-Length: '.strlen($payload);
             $headers[] = 'Content-Type: application/json';
@@ -90,6 +91,11 @@ class RelateIQRequest{
 
 
         curl_close($ch);
+        if($this->debug){
+            echo "\n-----RAW----\n";
+            echo $body;
+            echo "\n-----\n";
+        }
         $return = json_decode($body);
         if($this->debug) print_r($return);
         return $return;

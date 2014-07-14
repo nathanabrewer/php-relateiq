@@ -30,19 +30,30 @@ Class RelateIQContact{
         }
     }
 
-    public static function createFromResponse($response){
+    public static function fetch($cid){
+        $request = new RelateIQRequest();
+        $contact = self::handleResponse( $request->newGet('contacts/'.$cid) );
+        return $contact;
+    }
+    public static function fetchAll(){
+        $request = new RelateIQRequest();
+        $contact = self::handleResponse( $request->newGet('contacts') );
+        return $contact;
+    }
+
+    public static function handleResponse($response){
         if(isset($response->objects)){
             $objects = array();
             foreach($response->objects as $object){
-                $objects[] = self::createFromResponseObject($object);
+                $objects[] = self::parseResponseObject($object);
             }
             return $objects;
         } else {
-            return self::createFromResponseObject($response);
+            return self::parseResponseObject($response);
         }
     }
 
-    public static function createFromResponseObject($response){
+    public static function parseResponseObject($response){
         $contact = new RelateIQContact(
             isset($response->properties->name) ? $response->properties->name : null,
             isset($response->properties->email) ? $response->properties->email : null,
@@ -54,43 +65,5 @@ Class RelateIQContact{
         return $contact;
     }
 
-
-}
-
-Class RelateIQContactProperties{
-    public $name = array();
-    public $email = array();
-    public $phone = array();
-    public $address = array();
-
-    public function add($property, $value){
-        if(property_exists($this, $property)){
-            $this->{$property}[] = array('value' => $value);
-            return true;
-        }
-        return false;
-    }
-
-    public function get($property){
-        if(property_exists($this, $property)){
-            $return = array();
-            foreach($this->$property as $v)
-                $return[] = $v['value'];
-            return $return;
-        }
-        return false;
-    }
-
-    public function remove($property, $value){
-        if(property_exists($this, $property)){
-            foreach($this->$property as $index => $v){
-                if($v['value'] == $value){
-                    array_splice($this->$property, $index, 1);
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
 }
