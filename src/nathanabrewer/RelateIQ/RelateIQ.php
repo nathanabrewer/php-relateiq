@@ -1,4 +1,12 @@
 <?php
+/**
+ * @author Nathan A Brewer <nathan.a.brewer@dftz.org>
+ * @link http://dftz.org/
+ * @license http://opensource.org/licenses/mit-license.php The MIT License
+ */
+
+
+namespace nathanabrewer\RelateIQ;
 
 class RelateIQ{
 
@@ -12,32 +20,58 @@ class RelateIQ{
     private $debug = false;
     private $error = '';
 
+    /**
+     * @param null $key
+     * @param null $secret
+     * @param null $listId
+     */
     function __construct($key=null, $secret=null, $listId=null){
-        if($key) $this->key = $key;
-        if($secret) $this->secret = $secret;
+        if($key && $secret) Resource\RelateIQConfig::setKey($key, $secret);
         if($listId) $this->listId = $listId;
     }
 
+    /**
+     * @param $debug
+     */
     public function setDebug($debug){
         $this->debug = $debug;
     }
+
+    /**
+     * @return string
+     */
     public function getError(){
         return $this->error;
     }
 
+    /**
+     * @param null $listId
+     * @return RelateIQ
+     */
     public static function getObject($listId=null){
         return new self(null, null, $listId);
     }
 
+    /**
+     * @param $listId
+     */
     public function setListId($listId){
         $this->listId = $listId;
     }
 
+    /**
+     * @param $fieldName
+     * @param $fieldValue
+     */
     public function setFieldValue($fieldName, $fieldValue){
         $fieldId = $this->lookupFieldByName($fieldName);
         $this->data[$fieldId] = $fieldValue;
     }
 
+    /**
+     * @param $fieldName
+     * @param $fieldOptionText
+     */
     public function setFieldOption($fieldName, $fieldOptionText){
         if($this->debug)
             echo "Set Field Option $fieldName, $fieldOptionText\n";
@@ -48,6 +82,25 @@ class RelateIQ{
         $this->data[$fieldId] = $optionId;
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /**
+     * @param $name
+     * @return bool|int|string
+     */
     public function lookupFieldByName($name){
         if(!$this->listData){
             $this->listData = $this->getList();
@@ -58,10 +111,20 @@ class RelateIQ{
         return false;
     }
 
+    /**
+     * @param $name
+     * @param $optionText
+     * @return bool|int|string
+     */
     public function lookupFieldOptionByName($name, $optionText){
         return $this->lookupFieldOptionById(    $this->lookupFieldByName($name), $optionText   );
     }
 
+    /**
+     * @param $id
+     * @param $optionText
+     * @return bool|int|string
+     */
     public function lookupFieldOptionById($id, $optionText){
         if(!$this->listData){
             $this->listData = $this->getList();
@@ -74,7 +137,10 @@ class RelateIQ{
         return false;
     }
 
-    public function getList(){
+    /**
+     * @return array
+     */
+    public function _______getList(){
         $temp = array();
         $results = $this->newGet('lists');
         foreach($results->fields as $field){
@@ -89,6 +155,13 @@ class RelateIQ{
     }
 
     /* create contact, return Contact ID */
+    /**
+     * @param $name
+     * @param null $email
+     * @param null $phone
+     * @param null $address
+     * @return bool
+     */
     public function createContact($name, $email=null, $phone=null, $address=null){
         $request =      array( 'name' =>   array(array('value'=> $name    )));
         if($email)   $request['email'] =   array(array('value'=> $email   ));
@@ -104,11 +177,38 @@ class RelateIQ{
         return false;
     }
 
+    public function getList($listId){
+        return Resource\RelateIQList::fetch($listId);
+    }
+
+    public function getLists(){
+        return Resource\RelateIQList::fetchAll();
+    }
+
+    public function getContact($cid){
+        return Resource\RelateIQContact::fetch($cid);
+    }
+
+    public function getContacts(){
+        return Resource\RelateIQContact::fetchAll();
+    }
+
     /* Alias for creating new listitem entry */
+    /**
+     * @param $contacts
+     * @param null $values
+     * @return bool
+     */
     public function newListitem($contacts, $values=null){
         return $this->updateListitem(null, $contacts, $values);
     }
 
+    /**
+     * @param $id
+     * @param $contacts
+     * @param null $values
+     * @return bool
+     */
     public function updateListitem($id, $contacts, $values=null){
         //we might use setFieldValue/ setFieldOption to build the values array, so here...
         if(!$values) $values = $this->data;
@@ -140,23 +240,55 @@ class RelateIQ{
         return false;
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function readListItem($id){
         return $this->newGet('lists/'. $this->listId.'/listitems/'.$id);
     }
 
+
+
+
+
+
+
+
+    /**
+     * @param $target
+     * @param null $data
+     * @return mixed
+     */
     private function newPost($target,$data=null){
         return $this->send('POST', $target, $data);
     }
 
+    /**
+     * @param $target
+     * @param null $data
+     * @return mixed
+     */
     private function newPut($target,$data=null){
         return $this->send('PUT', $target, $data);
     }
 
+    /**
+     * @param $target
+     * @param null $data
+     * @return mixed
+     */
     private function newGet($target,$data=null){
         if($target=="lists") $target .= "/".$this->listId;
         return $this->send('GET', $target, $data);
     }
 
+    /**
+     * @param $requestType
+     * @param $target
+     * @param $data
+     * @return mixed
+     */
     private function send($requestType, $target, $data){
         $headers = array();
         $ch = curl_init($this->apiEndpoint.$target);
