@@ -7,6 +7,7 @@
 
 
 namespace nathanabrewer\RelateIQ;
+use nathanabrewer\RelateIQ\Resource;
 
 class RelateIQ{
 
@@ -191,6 +192,9 @@ class RelateIQ{
 
     public function getContacts(){
         return Resource\RelateIQContact::fetchAll();
+    }
+    public function newContact($name, $email=null, $phone=null, $address=null){
+        return new Resource\RelateIQContact($name, $email, $phone, $address);
     }
 
     /* Alias for creating new listitem entry */
