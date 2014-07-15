@@ -10,11 +10,23 @@ Class RelateIQList{
     public $listType;
     public $fields = array();
 
+    public function listItemContainer(){
+        $listItemContainer =  new RelateIQListItem;
+        $listItemContainer->setList($this);
+        return $listItemContainer;
+    }
+
     public function getListItem($listItemId){
         return RelateIQListItem::fetch($this, $listItemId);
     }
+
     public function getListItems(){
+        //TODO:: paginate?
         return RelateIQListItem::fetchAll($this);
+    }
+
+    public function getListItemsForContacts($contacts){
+        return RelateIQListItem::fetchContacts($this, $contacts);
     }
 
     public function lookupFieldName($name){
@@ -38,11 +50,12 @@ Class RelateIQList{
 
     public static function handleResponse($response){
         if(isset($response->objects)){
-            $objects = array();
+            $listObjects = array();
             foreach($response->objects as $object){
-                $objects[] = self::parseResponseObject($object);
+                $list = self::parseResponseObject($object);
+                $listObjects[$list->id] = $list;
             }
-            return $objects;
+            return $listObjects;
         } else {
             return self::parseResponseObject($response);
         }

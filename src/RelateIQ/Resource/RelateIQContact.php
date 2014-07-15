@@ -8,6 +8,7 @@ Class RelateIQContact{
     public $modifiedDate;
     public $properties;
 
+
     function __construct($name=null, $email=null, $phone=null, $address=null){
         $contactProperty = new RelateIQContactProperties;
         if($name) foreach((array)$name as $v)
@@ -20,14 +21,28 @@ Class RelateIQContact{
             $contactProperty->add('address',(is_object($v)) ? $v->value : $v);
         $this->properties = $contactProperty;
     }
+    public function getName(){
+        return implode(',', $this->properties->get('name'));
+    }
+    public function getEmail(){
+        return implode(',', $this->properties->get('email'));
+    }
+    public function getPhone(){
+        return implode(',', $this->properties->get('phone'));
+    }
+    public function getAddress(){
+        return implode(',', $this->properties->get('address'));
+    }
 
     public function save(){
         $request = new RelateIQRequest;
         if($this->id){
-            $request->newPut('contacts/'.$this->id, $this);
+            $result = $request->newPut('contacts/'.$this->id, $this);
         }else{
-            $request->newPost('contacts', $this);
+            $result = $request->newPost('contacts', $this);
         }
+        if(!$result) return false;
+        return self::parseResponseObject($result);
     }
 
     public static function fetch($cid){

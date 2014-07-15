@@ -24,12 +24,15 @@ Class RelateIQListItem{
 
 
     //not supporting multiselect yet i guess....
-    public function setField($name, $value){
+    public function setField($name, $values){
         $field = $this->list->lookupFieldName($name);
         if(!$field)
             return false;
-        if(isset($field->id))
-        $this->fieldValues[$field->id] = array(array('raw' => $field->resolveFieldValue($value) ));
+        //should check if field is multiSelect to throw an error.
+        if(isset($field->id)){
+            foreach((array)$values as $v)
+            $this->fieldValues[$field->id][] = array('raw' => $field->resolveFieldValue($v) );
+        }
     }
 
     public function save(){
@@ -40,17 +43,43 @@ Class RelateIQListItem{
             return $request->newPost('lists/'.$this->listId.'/listitems/', $this);
         }
     }
+    public function setList(RelateIQList $list){
+        $this->list = $list;
+        $this->listId = $list->id;
+    }
+    public function getList(){
+        return $this->list;
+    }
+    public function setContact(RelateIQContact $contact){
+        $this->contactId = array( $contact->id );
+    }
 
     public static function fetch($list, $listItemId){
         $request = new RelateIQRequest();
         $listItem = self::handleResponse( $list, $request->newGet('lists/'.$list->id.'/listitems/'.$listItemId) );
         return $listItem;
     }
+
     public static function fetchAll($list){
         $request = new RelateIQRequest();
         $listItems = self::handleResponse( $list, $request->newGet('lists/'.$list->id.'/listitems/') );
         return $listItems;
     }
+
+    public static function fetchContacts($list, $contacts){
+        $request = new RelateIQRequest();
+        $contactIds = array();
+        if(is_array($contacts)){
+            foreach((array)$contacts as $contact){
+                $contactIds[] = (is_object($contact)) ? $contact->id : $contact;
+            }
+        }else{
+            $contactIds[] = (is_object($contacts)) ? $contacts->id : $contacts;
+        }
+        $listItems = self::handleResponse( $list, $request->newGet('lists/'.$list->id.'/listitems/?_ids='.implode(',', $contactIds)) );
+        return $listItems;
+    }
+
 
     public static function handleResponse($list, $response){
         if(isset($response->objects)){
@@ -75,8 +104,7 @@ Class RelateIQListItem{
             $listItem->fieldValues[$key] = $fieldValue;
         }
 
-        $listItem->listId = $list->id;
-        $listItem->list = $list;
+        $listItem->setList($list);
 
         return $listItem;
     }

@@ -8,7 +8,7 @@ class RelateIQRequest{
     protected $key = "";
     protected $secret = "";
     protected $apiEndpoint = "https://api.relateiq.com/v2/";
-    protected $debug = true;
+    protected $debug = false;
     protected $data = array();
 
     function __construct($key=null, $secret=null){

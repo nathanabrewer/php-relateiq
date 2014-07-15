@@ -10,18 +10,21 @@ use nathanabrewer\RelateIQ\Resource;
 
 class RelateIQ{
 
+    public $lists = array();
+
     function __construct($key=null, $secret=null, $listId=null){
         if($key && $secret) Resource\RelateIQConfig::setKey($key, $secret);
         if($listId) $this->listId = $listId;
     }
-
 
     public function getList($listId){
         return Resource\RelateIQList::fetch($listId);
     }
 
     public function getLists(){
-        return Resource\RelateIQList::fetchAll();
+        if(count($this->lists) < 1)
+            $this->lists = Resource\RelateIQList::fetchAll();
+        return $this->lists;
     }
 
     public function getContact($cid){
@@ -34,6 +37,15 @@ class RelateIQ{
 
     public function newContact($name, $email=null, $phone=null, $address=null){
         return new Resource\RelateIQContact($name, $email, $phone, $address);
+    }
+
+    public function getAllListItemsForContact($contacts){
+        $lists = $this->getLists();
+        $listItems = array();
+        foreach($lists as $list){
+            $listItems = array_merge($listItems, $list->getListItemsForContacts($contacts));
+        }
+        return $listItems;
     }
 
 }

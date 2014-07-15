@@ -18,7 +18,7 @@ foreach($csv as $rep){
     $address = null;
 
     $contact = $riq->newContact($name, $email, $phone, $address);
-    $contact->save();
+    $contact = $contact->save();
 
     echo "Saved $name as {$contact->id}\n";
 }
