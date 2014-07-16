@@ -40,7 +40,8 @@ Class RelateIQListItem{
         if($this->id){
             return $request->newPut('lists/'.$this->listId.'/listitems/'.$this->id, $this);
         }else{
-            return $request->newPost('lists/'.$this->listId.'/listitems/', $this);
+            $result = $request->newPost('lists/'.$this->listId.'/listitems/', $this);
+            if($result->id) $this->id = $result->id;
         }
     }
     public function setList(RelateIQList $list){
@@ -51,7 +52,7 @@ Class RelateIQListItem{
         return $this->list;
     }
     public function setContact(RelateIQContact $contact){
-        $this->contactId = array( $contact->id );
+        $this->contactIds = array( $contact->id );
     }
 
     public static function fetch($list, $listItemId){
