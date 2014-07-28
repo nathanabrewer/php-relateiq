@@ -21,7 +21,7 @@ Example below will run two API Queries, one GET and one PUT.
     $contact->properties->add('email', 'nathan.a.brewer@dftz.org');
     $contact->save();
 
-Lookup the available Lists... Make sure the List is shared with you! This is runs a sinle GET Request
+Lookup the available Lists... Make sure the List is shared with you! This will runs a single GET Request
 
     $lists = $riq->getLists();
     foreach($lists as $list){
@@ -29,8 +29,9 @@ Lookup the available Lists... Make sure the List is shared with you! This is run
     }
 
 Here, Rather than look at all the Lists, I am asking each List for List Items that contain this Contact. This will do a series of API GET requests
-- GET Request for all avaliable Lists (If I have not done one yet)
-- GET Request per List for all ListItems with contact
+* GET Request for all avaliable Lists (If I have not done one yet)
+* GET Request per List for all ListItems with contact
+
 
     $listItems = $riq->getAllListItemsForContact($contact);
     foreach($listItems as $listItem){
