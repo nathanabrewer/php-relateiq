@@ -28,10 +28,7 @@ Lookup the available Lists... Make sure the List is shared with you! This will r
         echo "{$list->id} -- {$list->title}\n";
     }
 
-Here, Rather than look at all the Lists, I am asking each List for List Items that contain this Contact. This will do a series of API GET requests
-* GET Request for all avaliable Lists (If I have not done one yet)
-* GET Request per List for all ListItems with contact
-
+Here, Rather than look at all the Lists, I am asking each List for List Items that contain this Contact. This will do a series of API GET requests:  1. A GET Request for all avaliable Lists (If I have not done one yet) 2. A GET Request per List for all ListItems with contact
 
     $listItems = $riq->getAllListItemsForContact($contact);
     foreach($listItems as $listItem){
