@@ -1,4 +1,4 @@
-php-relateiq
+OBSOLETE - php-relateiq
 ============
 
 Simple class to quickly read and write stuff in RelateIQ. I do not have anything that is in place for Accounts at this moment, only simple Contact and List/ListItem stuff.
